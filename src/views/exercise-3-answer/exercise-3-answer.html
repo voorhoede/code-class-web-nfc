@@ -83,8 +83,8 @@
 					});
 				}
 
-				reader.onerror = event => {
-					error.innerText = event.message;
+				reader.onreadingerror = event => {
+					error.innerText = event && '❌ This tag is not supported';
 				}
 			} catch (err) {
 				console.error(err)
