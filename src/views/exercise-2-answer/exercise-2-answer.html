@@ -1,0 +1,92 @@
+{% extends "views/_base/base.html" %}
+
+{% block navigation %}
+<nav class="cc-navigation">
+	<a href="/exercise-2/" class="cc-back-link">&#8592; back to exercise</a>
+</nav>
+{% endblock %}
+
+{% block introduction %}
+<h1>Exercise - 2 - Answer</h1>
+<p>
+	Read out different NFC tags you have at home and log the serialnumber and from the message the records.
+	These records contains recordType, mediaType and a data array which have to be decoded with a TextEncoder.
+</p>
+{% endblock %}
+
+{% block html %}
+<section class="cc-html-playground">
+	<button id="scan-button" type="button" class="button">Start scanning</button>
+	<p id="error" class="error"></p>
+	<p id="message"></p>
+	<pre id="log"></pre>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+	.button {
+		background-color: blue;
+		color: white;
+		padding: 1rem 2rem;
+		border-radius: .5rem;
+		border: none;
+		margin-bottom: 2rem;
+	}
+
+	.error {
+		color: red;
+	}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+	import {scanButton, error, message} from '/assets/js/elements.js';
+
+	const supportNFC = 'NDEFReader' in window;
+
+	scanButton.addEventListener('click', readTag)
+
+	async function readTag() {
+		if (supportNFC) {
+			const reader = new NDEFReader();
+			message.innerText = 'Hold your phone near the scannable item'
+
+			try {
+				await reader.scan();
+				reader.onreading = event => {
+					message.innerText = '';
+					error.innerText = '';
+
+					const decoder = new TextDecoder();
+
+					const {serialNumber} = event;
+					const {records} = event.message;
+
+					printData(`Serial number: ${serialNumber}`);
+
+					records.map(record => {
+						printData(`Record type: ${record.recordType}`);
+						printData(`MIME type: ${record.mediaType}`);
+						record.data && printData(`Data \n ${decoder.decode(record.data)}`);
+					});
+				}
+
+				reader.onreadingerror = event => {
+					error.innerText = event && '❌ This tag is not supported';
+				}
+			} catch (err) {
+				error.innerText = err;
+			}
+		} else {
+			error.innerText = 'Web NFC is not supported in your current browser'
+		}
+	}
+
+	function printData(data) {
+		const log = document.getElementById('log');
+		log.innerHTML += data + '\n';
+	}
+</script>
+{% endblock %}

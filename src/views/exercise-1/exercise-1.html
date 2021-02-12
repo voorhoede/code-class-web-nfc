@@ -1,0 +1,67 @@
+{% extends "views/_base/base.html" %}
+
+{% block navigation %}
+<nav class="cc-navigation">
+	<a href="/" class="cc-back-link">&#8592; back to overview</a>
+	<a href="/exercise-1-answer/" class="cc-answer-link">See answer &#8594;</a>
+</nav>
+{% endblock %}
+
+{% block introduction %}
+<h1>Exercise - 1</h1>
+<p>In the Web NFC api you can scan tags that are supported in an NDEF format. Make sure these tags are scannable and
+	supported.</p>
+{% endblock %}
+
+{% block html %}
+<section class="cc-html-playground">
+	<button id="scan-button" type="button" class="button">Start scanning</button>
+	<p id="error" class="error"></p>
+	<p id="message"></p>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+	.button {
+		background-color: blue;
+		color: white;
+		padding: 1rem 2rem;
+		border-radius: .5rem;
+		border: none;
+		margin-bottom: 2rem;
+	}
+
+	.error {
+		color: red;
+	}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+	import {scanButton, error, message} from '/assets/js/elements.js';
+
+	const supportNFC = 'NDEFReader' in window;
+
+	scanButton.addEventListener('click', readTag)
+
+	async function readTag() {
+		if (supportNFC) {
+			// TODO: 1. initialize a new NDEFReader
+			message.innerText = 'Hold your phone near the scannable item'
+
+			try {
+				// TODO: 2. wait for the reader to scan
+				// TODO: 3. implement onreading from the NDEFReader object and show if the tag is scannable
+				// TODO: 4. implement onreadingerror from the NDEFReader object and show the error
+
+			} catch (err) {
+				error.innerText = err;
+			}
+		} else {
+			error.innerText = 'Web NFC is not supported in your current browser'
+		}
+	}
+</script>
+{% endblock %}

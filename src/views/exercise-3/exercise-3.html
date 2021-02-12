@@ -1,0 +1,122 @@
+{% extends "views/_base/base.html" %}
+
+{% block navigation %}
+<nav class="cc-navigation">
+	<a href="/" class="cc-back-link">&#8592; back to overview</a>
+	<a href="/exercise-3-answer/" class="cc-answer-link">See answer &#8594;</a>
+</nav>
+{% endblock %}
+
+{% block introduction %}
+<h1>Exercise - 3</h1>
+<p>Write data to your empty NFC card. Remove data from your NFC card</p>
+{% endblock %}
+
+{% block html %}
+<section class="cc-html-playground">
+	<button id="scan-button" type="button" class="button">Scan card</button>
+	<button id="write-button" type="button" class="button">Write card</button>
+	<button id="clear-button" type="button" class="button">Clear card</button>
+	<p id="error" class="error"></p>
+	<p id="message"></p>
+	<pre id="log"></pre>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+	.button {
+		background-color: blue;
+		color: white;
+		padding: .5rem;
+		border-radius: .3rem;
+		border: none;
+		margin-bottom: 2rem;
+	}
+
+	.error {
+		color: red;
+	}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+	import {
+		scanButton,
+		writeButton,
+		error,
+		clearButton,
+		message
+	} from '/assets/js/elements.js';
+
+	const supportNFC = 'NDEFReader' in window;
+
+	if (supportNFC) {
+		const reader = new NDEFReader();
+		const decoder = new TextDecoder();
+
+		// TODO: 1. create new text encoder
+
+		scanButton.addEventListener('click', readTag);
+		writeButton.addEventListener('click', writeTag);
+		clearButton.addEventListener('click', clearTag);
+
+		message.innerText = 'Hold your phone near the scannable item'
+
+		async function readTag() {
+			try {
+				await reader.scan();
+
+				reader.onreading = event => {
+					message.innerText = '';
+
+					const {serialNumber} = event;
+					const {records} = event.message;
+
+					printData(`Serial number: ${serialNumber}`);
+
+					records.map(record => {
+						if (record.mediaType === 'application/json') {
+							const data = JSON.parse(decoder.decode(record.data));
+
+							printData(`${data.firstName} - ${data.lastName}`);
+						}
+					});
+				}
+
+				reader.onerror = event => {
+					error.innerText = event.message;
+				}
+			} catch (err) {
+				console.error(err)
+			}
+		}
+
+		async function writeTag() {
+			try {
+				// TODO: 2. write data to your blanco NFC card with the write function.
+			} catch (err) {
+				error.innerText = err;
+			}
+		}
+
+		async function clearTag() {
+
+			// TODO: 3. create an empty record
+
+			try {
+				// TODO: 4. write your empty record to your card
+			} catch (err) {
+				error.innerText = err;
+			}
+		}
+	}
+
+
+	function printData(data) {
+		const log = document.getElementById('log');
+		log.innerHTML += data + '\n';
+	}
+</script>
+{% endblock %}

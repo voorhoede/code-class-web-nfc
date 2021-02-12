@@ -1,0 +1,86 @@
+{% extends "views/_base/base.html" %}
+
+{% block navigation %}
+<nav class="cc-navigation">
+	<a href="/" class="cc-back-link">&#8592; back to overview</a>
+	<a href="/exercise-2-answer/" class="cc-answer-link">See answer &#8594;</a>
+</nav>
+{% endblock %}
+
+{% block introduction %}
+<h1>Exercise - 2</h1>
+<p>
+	Read out different NFC tags you have at home and log the serialnumber and from the message the records.
+	These records contains recordType, mediaType and a data array which have to be decoded with a TextEncoder.
+</p>
+{% endblock %}
+
+{% block html %}
+<section class="cc-html-playground">
+	<button id="scan-button" type="button" class="button">Start scanning</button>
+	<p id="error" class="error"></p>
+	<p id="message"></p>
+	<pre id="log"></pre>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+	.button {
+		background-color: blue;
+		color: white;
+		padding: 1rem 2rem;
+		border-radius: .5rem;
+		border: none;
+		margin-bottom: 2rem;
+	}
+
+	.error {
+		color: red;
+	}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+	import {scanButton, error, message} from '/assets/js/elements.js';
+
+	const supportNFC = 'NDEFReader' in window;
+
+	scanButton.addEventListener('click', readTag)
+
+	async function readTag() {
+		if (supportNFC) {
+			const reader = new NDEFReader();
+			message.innerText = 'Hold your phone near the scannable item'
+
+			try {
+				await reader.scan();
+				reader.onreading = event => {
+					message.innerText = '';
+					error.innerText = '';
+
+					// TODO: 1. create a new TextDecoder
+
+					// TODO: 2. print out the serial number of your card with the printData function
+
+					// TODO: 3. loop of the event messages and print out recordType, mediaType and decode the data.
+				}
+
+				reader.onreadingerror = event => {
+					error.innerText = event && '❌ This tag is not supported';
+				}
+			} catch (err) {
+				error.innerText = err;
+			}
+		} else {
+			error.innerText = 'Web NFC is not supported in your current browser'
+		}
+	}
+
+	function printData(data) {
+		const log = document.getElementById('log');
+		log.innerHTML += data + '\n';
+	}
+</script>
+{% endblock %}
